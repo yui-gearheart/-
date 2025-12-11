@@ -9,3 +9,6 @@
 3.在右方選擇遊戲進行速度（默認為慢速）
 4.點擊「開始戰鬥」，即開始戰鬥，雙方輪流使用技能，戰鬥記錄顯示在中央消息框中
 5.點擊「停止戰鬥」可提前終止戰鬥，並輸出傷害和治療統計結果
+
+英雄介紹：
+<img width="774" height="474" alt="image" src="https://github.com/user-attachments/assets/a1e8154f-4719-434b-a016-bfa8290c40ba" />
