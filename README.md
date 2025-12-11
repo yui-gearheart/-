@@ -11,4 +11,3 @@
 5.點擊「停止戰鬥」可提前終止戰鬥，並輸出傷害和治療統計結果
 
 英雄介紹：
-<img width="774" height="474" alt="image" src="https://github.com/user-attachments/assets/a1e8154f-4719-434b-a016-bfa8290c40ba" />
