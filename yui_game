@@ -6,7 +6,7 @@ import random
 import time
 from decimal import *
 
-yui_dir = 'D:/game_data/'
+yui_dir = 'game_data/'
 
 def target_chose(team, mode='min'):
     hp_rate = []
@@ -957,13 +957,24 @@ class YuiStart(threading.Thread):
                     break
             if stop:
                 break
-            if not t1_tmp and not t2_tmp:
+            t1_alive = False
+            t2_alive = False
+            for a in t1_tmp:
+                if not a.master:
+                    t1_alive = True
+                    break
+            for a in t2_tmp:
+                if not a.master:
+                    t2_alive = True
+                    break
+
+            if not t1_alive and not t2_alive:
                 battle_disp('同歸於盡，挑戰失敗')
                 break
-            if not t1_tmp:
+            elif not t1_alive:
                 battle_disp('挑戰失敗')
                 break
-            if not t2_tmp:
+            elif not t2_alive:
                 battle_disp('挑戰成功')
                 break
 
