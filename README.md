@@ -30,6 +30,8 @@
 
 <img width="778" height="564" alt="image" src="https://github.com/user-attachments/assets/f56dbd43-3a83-4a28-b66b-f4cf91f0aedf" />
 
+<img width="772" height="596" alt="image" src="https://github.com/user-attachments/assets/a03bcad0-2e47-42af-8a81-ba9fea665e84" />
+
 <img width="780" height="514" alt="image" src="https://github.com/user-attachments/assets/2af0669d-31b7-4e4d-8f7a-a08dd9eabbf5" />
 
 <img width="774" height="544" alt="image" src="https://github.com/user-attachments/assets/58b51a63-c3f9-47eb-b82a-becd0ac72e61" />
@@ -45,7 +47,7 @@ BOSS介紹：
 
 <img width="774" height="710" alt="image" src="https://github.com/user-attachments/assets/17e2ed6f-a502-4f0c-a44f-92f2d0d2209b" />
 
-<img width="802" height="852" alt="image" src="https://github.com/user-attachments/assets/43db56ab-bf10-49e4-b129-01b466c02aea" />
+<img width="800" height="854" alt="image" src="https://github.com/user-attachments/assets/eb153c2f-b965-45b3-943e-6702c7d520d2" />
 
 <img width="774" height="728" alt="image" src="https://github.com/user-attachments/assets/24a15bc3-0f0e-4ea7-870e-dcb783ce3ae8" />
 
