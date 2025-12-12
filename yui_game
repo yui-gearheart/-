@@ -78,14 +78,14 @@ class YuiAgent:
             elif s.target == 'friend':  # 對友軍使用
                 if s.range == 3:  # 全體技能
                     orbs = t1.copy()
-                    ind = [0]
+                    ind = list(range(len(orbs)))
                 else:
                     t_chose = t1
                     ind = list(range(len(t_chose)))
             else:
                 if s.range == 3:  # 全體技能
                     orbs = t2.copy()
-                    ind = [0]
+                    ind = list(range(len(orbs)))
                 else:
                     t_chose = t2
                     ind = []
@@ -347,6 +347,8 @@ class YuiDebuff:
             orb.no_miss -= self.dmg
         elif self.attr == '防禦力':
             orb.df -= self.dmg
+        elif self.attr == '暴擊':
+            orb.critical -= self.dmg
 
     def offset(self, orb):
         battle_disp(orb.name + '從' + self.name + '狀態中恢復')
@@ -354,6 +356,8 @@ class YuiDebuff:
             orb.no_miss += self.dmg
         elif self.attr == '防禦力':
             orb.df += self.dmg
+        elif self.attr == '暴擊':
+            orb.critical += self.dmg
 
 
 inf = Decimal('inf')
@@ -443,6 +447,17 @@ magret.skill.append(YuiSkill('鐳射', dmg=20, cd=3))
 magret.skill.append(YuiSkill('治療', -15, target='friend', cd=2))
 magret.skill.append(YuiSkill('射擊'))
 
+elijah = YuiAgent('伊利亞', hp=100, atk=15, df=12)
+s = YuiSkill('麻醉', dmg=0, cd=3, r=3)
+s.debuff = YuiDebuff('走神', '暴擊', 30, 2)
+s.cost = 0
+elijah.skill.append(s)
+s = YuiSkill('強氧化劑', dmg=20, cd=3, r=2)
+s.debuff = YuiDebuff('燃燒', '傷害', 5, last=3)
+elijah.skill.append(s)
+elijah.skill.append(YuiSkill('重鉻酸洗液', dmg=20, cd=1, r=2))
+elijah.skill.append(YuiSkill('杖擊'))
+
 dominion = YuiAgent('多米妮安', hp=90, atk=20, df=12)
 s = YuiSkill('驅散', dmg=0, target='friend', r=2, cd=2)
 s.cost = 0
@@ -527,13 +542,14 @@ andreas.skill.append(YuiSkill('重踢'))
 
 hammett = YuiAgent('哈密特', hp=1200, atk=18, df=15)
 hammett.resist.append('侵蝕')
-s = YuiSkill('六氟銻酸雨', dmg=40, cd=inf, r=3)
+s = YuiSkill('六氟銻酸雨', dmg=30, cd=inf, r=3)
 s.cond = 50
 s.debuff = YuiDebuff('侵蝕', '防禦力', 5, last=inf)
 hammett.skill.append(s)
 s = YuiSkill('強氧化劑', dmg=20, cd=3, r=2)
 s.debuff = YuiDebuff('燃燒', '傷害', 5, last=3)
-s = YuiSkill('六氟銻酸', dmg=30, cd=1, r=2)
+hammett.skill.append(s)
+s = YuiSkill('六氟銻酸', dmg=25, cd=1, r=2)
 s.debuff = YuiDebuff('侵蝕', '防禦力', 2, last=3)
 hammett.skill.append(s)
 hammett.skill.append(YuiSkill('坩堝鉗'))
@@ -581,7 +597,7 @@ window.geometry('1000x600')
 
 all_hero = {'貝羅斯': belos, '塞萊茜布': celexib, '蕾吉娜': regina, '喬恩': donnet, '艾莉安': elion,
             '薇莉安娜': willianna, '琉塔': lyuda, '哈拉爾德': harald, '瑪格麗特': magret, '歐若拉': eurora,
-            '多米妮安': dominion, '莉姬亞': ligeia,
+            '伊利亞': elijah, '多米妮安': dominion, '莉姬亞': ligeia,
             '西里烏斯': sirius, '少爺': bouya, '卡伊達': kaeda, '阿蒂雅': adeak, '安朵蕾雅絲': andreas,
             '哈密特': hammett, '克維德': covid, '坦博拉': tambora}
 
@@ -715,6 +731,7 @@ images = {
     "哈拉爾德": load_image(yui_dir + "哈拉爾德.png"),
     "瑪格麗特": load_image(yui_dir + "瑪格麗特.png"),
     "歐若拉": load_image(yui_dir + "歐若拉.png"),
+    "伊利亞": load_image(yui_dir + "伊利亞.png"),
     "多米妮安": load_image(yui_dir + "多米妮安.png"),
     "莉姬亞": load_image(yui_dir + "莉姬亞.png"),
     "西里烏斯": load_image(yui_dir + "西里烏斯.png"),
@@ -795,6 +812,7 @@ menu.add_command(label="琉塔（狙擊手，傷害輸出）", command=lambda: h
 menu.add_command(label="哈拉爾德（戰士，治療/坦克）", command=lambda: hero('哈拉爾德', 0))
 menu.add_command(label="瑪格麗特（弓箭手，治療/傷害輸出）", command=lambda: hero('瑪格麗特', 0))
 menu.add_command(label="歐若拉（聖騎士，治療/輔助）", command=lambda: hero('歐若拉', 0))
+menu.add_command(label="伊利亞（煉金術師，輔助/傷害輸出）", command=lambda: hero('伊利亞', 0))
 menu.add_command(label="多米妮安（牧師，治療/輔助）", command=lambda: hero('多米妮安', 0))
 menu.add_command(label="莉姬亞（刺客，傷害輸出）", command=lambda: hero('莉姬亞', 0))
 
@@ -817,6 +835,7 @@ menu2.add_command(label="琉塔（狙擊手，傷害輸出）", command=lambda: 
 menu2.add_command(label="哈拉爾德（戰士，治療/坦克）", command=lambda: hero('哈拉爾德', 1))
 menu2.add_command(label="瑪格麗特（弓箭手，治療/傷害輸出）", command=lambda: hero('瑪格麗特', 1))
 menu2.add_command(label="歐若拉（聖騎士，治療/輔助）", command=lambda: hero('歐若拉', 1))
+menu2.add_command(label="伊利亞（煉金術師，輔助/傷害輸出）", command=lambda: hero('伊利亞', 1))
 menu2.add_command(label="多米妮安（牧師，治療/輔助）", command=lambda: hero('多米妮安', 1))
 menu2.add_command(label="莉姬亞（刺客，傷害輸出）", command=lambda: hero('莉姬亞', 1))
 
@@ -839,6 +858,7 @@ menu3.add_command(label="琉塔（狙擊手，傷害輸出）", command=lambda: 
 menu3.add_command(label="哈拉爾德（戰士，治療/坦克）", command=lambda: hero('哈拉爾德', 2))
 menu3.add_command(label="瑪格麗特（弓箭手，治療/傷害輸出）", command=lambda: hero('瑪格麗特', 2))
 menu3.add_command(label="歐若拉（聖騎士，治療/輔助）", command=lambda: hero('歐若拉', 2))
+menu3.add_command(label="伊利亞（煉金術師，輔助/傷害輸出）", command=lambda: hero('伊利亞', 2))
 menu3.add_command(label="多米妮安（牧師，治療/輔助）", command=lambda: hero('多米妮安', 2))
 menu3.add_command(label="莉姬亞（刺客，傷害輸出）", command=lambda: hero('莉姬亞', 2))
 
@@ -861,6 +881,7 @@ menu4.add_command(label="琉塔（狙擊手，傷害輸出）", command=lambda: 
 menu4.add_command(label="哈拉爾德（戰士，治療/坦克）", command=lambda: hero('哈拉爾德', 3))
 menu4.add_command(label="瑪格麗特（弓箭手，治療/傷害輸出）", command=lambda: hero('瑪格麗特', 3))
 menu4.add_command(label="歐若拉（聖騎士，治療/輔助）", command=lambda: hero('歐若拉', 3))
+menu4.add_command(label="伊利亞（煉金術師，輔助/傷害輸出）", command=lambda: hero('伊利亞', 3))
 menu4.add_command(label="多米妮安（牧師，治療/輔助）", command=lambda: hero('多米妮安', 3))
 menu4.add_command(label="莉姬亞（刺客，傷害輸出）", command=lambda: hero('莉姬亞', 3))
 
@@ -883,6 +904,7 @@ menu5.add_command(label="琉塔（狙擊手，傷害輸出）", command=lambda: 
 menu5.add_command(label="哈拉爾德（戰士，治療/坦克）", command=lambda: hero('哈拉爾德', 4))
 menu5.add_command(label="瑪格麗特（弓箭手，治療/傷害輸出）", command=lambda: hero('瑪格麗特', 4))
 menu5.add_command(label="歐若拉（聖騎士，治療/輔助）", command=lambda: hero('歐若拉', 4))
+menu5.add_command(label="伊利亞（煉金術師，輔助/傷害輸出）", command=lambda: hero('伊利亞', 4))
 menu5.add_command(label="多米妮安（牧師，治療/輔助）", command=lambda: hero('多米妮安', 4))
 menu5.add_command(label="莉姬亞（刺客，傷害輸出）", command=lambda: hero('莉姬亞', 4))
 
