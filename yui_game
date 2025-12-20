@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from PIL import Image, ImageTk
 import threading
@@ -7,7 +6,7 @@ import random
 import time
 from decimal import *
 
-yui_dir = 'D:/game_data/'
+yui_dir = 'game_data/'
 
 
 def target_chose(team, mode='min'):
@@ -58,6 +57,17 @@ class YuiAgent:
         s.master = self
         s.team = self.team
 
+    def damage_proc(self, dmg):
+        self.hp_now -= dmg
+        if self.hp_now < 0:
+            dmg += self.hp_now
+            self.hp_now = 0
+        elif self.hp_now > self.hp:
+            dmg = dmg + self.hp_now - self.hp
+            self.hp_now = self.hp
+        update_hp_text(self)
+        return dmg
+
     def use_skill(self, skill, t1, t2):
         for s in skill:
             if s.cd_now > 0:
@@ -102,10 +112,10 @@ class YuiAgent:
                 ind = [0]
             elif s.target == 'friend':  # 對友軍使用
                 if s.range == 3:  # 全體技能
-                    orbs = [x for x in t1 if x.hp_now > 0 and x.name != '詛咒人偶']
+                    orbs = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船']]
                     ind = list(range(len(orbs)))
                 else:
-                    t_chose = [x for x in t1 if x.hp_now > 0 and x.name != '詛咒人偶']
+                    t_chose = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船']]
                     ind = list(range(len(t_chose)))
             elif s.name == '傷害轉移':
                 if self.orb.hp_now > 0:
@@ -180,6 +190,8 @@ class YuiAgent:
                         continue
                 if s.dmg > 0:
                     dmg = max(1, s.dmg + self.atk - orb.df)
+                    if s.name in ['巨浪', '大洪水']:
+                        dmg = dmg * (2 - ship_now.hp_now/500)
                 elif s.dmg < 0:
                     dmg = s.dmg - self.atk
                 else:
@@ -277,14 +289,7 @@ class YuiAgent:
                         update_hp_text(orb)
                     continue
 
-                orb.hp_now -= dmg
-                if orb.hp_now < 0:
-                    dmg += orb.hp_now
-                    orb.hp_now = 0
-                elif orb.hp_now > orb.hp:
-                    dmg = dmg + orb.hp_now - orb.hp
-                    orb.hp_now = orb.hp
-                update_hp_text(orb)
+                dmg = orb.damage_proc(dmg)
 
                 if dmg > 0:  # 傷害統計
                     orb.use_skill(orb.passive, t2, t1)
@@ -325,11 +330,7 @@ class YuiAgent:
                     dmg_min = round(dmg * 0.8)
                     dmg = random.randint(dmg_min, dmg_max)
                     battle_disp(self.name + '受到' + d.name + '的影響，回復了' + str(dmg) + '點生命力', self.team)
-                    self.hp_now += dmg
-                    if self.hp_now > self.hp:
-                        dmg = dmg - self.hp_now + self.hp
-                        self.hp_now = self.hp
-                    update_hp_text(self)
+                    dmg = self.damage_proc(dmg)
 
                     source = d.source
                     source.heal += dmg
@@ -354,11 +355,7 @@ class YuiAgent:
                     dmg_min = round(dmg * 0.8)
                     dmg = random.randint(dmg_min, dmg_max)
                     battle_disp(self.name + '受到' + str(dmg) + '點' + d.name + '傷害', self.team)
-                    self.hp_now -= dmg
-                    if self.hp_now < 0:
-                        dmg += self.hp_now
-                        self.hp_now = 0
-                    update_hp_text(self)
+                    dmg = self.damage_proc(dmg)
 
                     source = d.source
                     if source.master:
@@ -765,6 +762,18 @@ s.debuff = YuiDebuff('侵蝕', '防禦力', 2, last=3)
 hammett.skill.append(s)
 hammett.skill.append(YuiSkill('坩堝鉗'))
 
+marianus = YuiAgent('馬里阿努斯', hp=2000, atk=18, df=15)
+marianus.resist.append('燃燒')
+s = YuiSkill('大洪水', dmg=30, cd=inf, r=3)
+s.cond = 50
+marianus.skill.append(s)
+s = YuiSkill('深潛', target='self', dmg=0, cd=4)
+s.debuff = YuiBuff('潛水', '迴避', last=2)
+marianus.skill.append(s)
+marianus.skill.append(YuiSkill('巨浪', dmg=25, cd=1, r=2))
+marianus.skill.append(YuiSkill('三叉戟捅刺'))
+ship = YuiAgent('船', hp=500, atk=15, df=15)
+
 covid = YuiAgent('克維德', hp=2000, atk=15, df=15)
 covid.resist.append('中毒')
 s = YuiSkill('VX神經毒氣', dmg=0, cd=inf, r=3)
@@ -779,10 +788,10 @@ s.debuff = YuiDebuff('中毒', '傷害', 8, last=3)
 covid.skill.append(s)
 
 prospero = YuiAgent('普羅斯佩羅', hp=1800, atk=20, df=18)
-skeleton1 = YuiAgent('骷髏兵1', hp=200, atk=15, df=15)
+skeleton1 = YuiAgent('骷髏兵1', hp=200, atk=20, df=15)
 skeleton1.hate = -1
 skeleton1.skill.append(YuiSkill('劈砍'))
-skeleton2 = YuiAgent('骷髏兵2', hp=200, atk=15, df=15)
+skeleton2 = YuiAgent('骷髏兵2', hp=200, atk=20, df=15)
 skeleton2.hate = -1
 skeleton2.skill.append(YuiSkill('劈砍'))
 prospero.summon(skeleton1)
@@ -865,7 +874,7 @@ all_hero = {'貝羅斯': belos, '塞萊茜布': celexib, '蕾吉娜': regina, '�
             '莉布絲':libuse, '奈菲提': neferti, '伊利亞': elijah, '斯特勒魯卡': strelka, '多米妮安': dominion, '莉姬亞': ligeia,
             '西里烏斯': sirius, '少爺': bouya, '卡伊達': kaeda, '阿蒂雅': adeak, '黃泉引路人': way_guider,
             '安朵蕾雅絲': andreas, '船長格林威治': greenwich,
-            '哈密特': hammett, '克維德': covid,
+            '哈密特': hammett, '馬里阿努斯': marianus, '克維德': covid,
             '普羅斯佩羅': prospero, '骷髏兵1': skeleton1, '骷髏兵2': skeleton2,
             '坦博拉': tambora, '杜達耶夫': doudaiev,
             '聖王·貝羅斯': david}
@@ -940,6 +949,13 @@ title_summon = tk.Label(summon_frame, text="召喚獸", font=("Arial", 12), fg="
 #title_summon = tk.Label(summon_frame, text="召喚獣", font=("Arial", 12))
 title_summon.pack()
 
+ship_frame = tk.Frame(window)
+ship_frame.place(relx=0.02, rely=0.63, anchor="sw")
+icon_ship = tk.Label(ship_frame, anchor="w")
+icon_ship.pack(pady=5)
+name_ship = tk.Label(ship_frame, text="", font=("Arial", 12), anchor="w", fg="green")
+name_ship.pack()
+
 # 英雄圖標2
 
 hero21_frame = tk.Frame(window)
@@ -988,7 +1004,7 @@ name9 = tk.Label(boss_frame4, text="", font=("Arial", 12), anchor="w")
 # 顯示相關函式
 
 icons = [icon1, icon2, icon3, icon4, icon5, icon_summon]
-names = [name1, name2, name3, name4, name5, name_summon]
+names = [name1, name2, name3, name4, name5, name_summon, name_ship]
 
 icons2 = [icon6, icon7, icon8, icon9]
 names2 = [name6, name7, name8, name9]
@@ -1028,6 +1044,7 @@ def load_image(path, size=(120, 120)):
 
 images = {
     "空白": load_image(yui_dir + "空白.png"),
+    "船": load_image(yui_dir + "船.png", size=(100, 60)),
     "貝羅斯": load_image(yui_dir + "貝羅斯.png"),
     "塞萊茜布": load_image(yui_dir + "塞萊茜布.png"),
     "蕾吉娜": load_image(yui_dir + "蕾吉娜.png"),
@@ -1053,6 +1070,7 @@ images = {
     "安朵蕾雅絲": load_image(yui_dir + "安朵蕾雅絲.png"),
     "船長格林威治": load_image(yui_dir + "船長格林威治.png"),
     "哈密特": load_image(yui_dir + "哈密特.png"),
+    "馬里阿努斯": load_image(yui_dir + "馬里阿努斯.png"),
     "克維德": load_image(yui_dir + "克維德.png"),
     "普羅斯佩羅": load_image(yui_dir + "普羅斯佩羅.png"),
     "骷髏兵": load_image(yui_dir + "骷髏兵.png"),
@@ -1138,6 +1156,12 @@ def add_boss(option):
         if option == '卡伊達':
             t2.append('阿蒂雅')
         update_display2(t2)
+        if option == '馬里阿努斯':
+            icon_ship.config(image=images['船'])
+            name_ship.config(text='船\nHP: 500/500')
+        else:
+            icon_ship.config(image=images['空白'])
+            name_ship.config(text='')
 
 
 menu = tk.Menu(window, tearoff=False)
@@ -1292,6 +1316,7 @@ menu6.add_command(label="黃泉引路人（詛咒型）", command=lambda: add_bo
 menu6.add_command(label="安朵蕾雅絲（群攻法師型）", command=lambda: add_boss('安朵蕾雅絲'))
 menu6.add_command(label="船長格林威治（控制型）", command=lambda: add_boss('船長格林威治'))
 menu6.add_command(label="哈密特（弱化型）", command=lambda: add_boss('哈密特'))
+menu6.add_command(label="馬里阿努斯（水戰型）", command=lambda: add_boss('馬里阿努斯'))
 menu6.add_command(label="克維德（持續傷害型）", command=lambda: add_boss('克維德'))
 menu6.add_command(label="普羅斯佩羅(增益型）", command=lambda: add_boss('普羅斯佩羅'))
 menu6.add_command(label="坦博拉（狂戰士型）", command=lambda: add_boss('坦博拉'))
@@ -1459,9 +1484,11 @@ def battle_disp(v, team=4):
 hero_dps = ['蕾吉娜', '喬恩', '薇莉安娜', '琉塔', '瑪格麗特', '伊利亞', '莉姬亞', '奈菲提', '莉布絲', '斯特勒魯卡']
 hero_t = ['貝羅斯', '哈拉爾德']
 hero_heal = ['塞萊茜布', '歐若拉', '多米妮安']
-boss = ['西里烏斯', '少爺', '卡伊達', '黃泉引路人', '安朵蕾雅絲', '船長格林威治', '哈密特', '克維德', '普羅斯佩羅', '坦博拉']
+boss = ['西里烏斯', '少爺', '卡伊達', '黃泉引路人', '安朵蕾雅絲', '船長格林威治', '哈密特', '馬里阿努斯', '克維德', '普羅斯佩羅', '坦博拉', '杜達耶夫']
 
 test_mode = False
+
+ship_now = ship
 
 
 class YuiStart(threading.Thread):
@@ -1479,7 +1506,7 @@ class YuiStart(threading.Thread):
         return False
 
     def run(self):
-        global ongoing, t1, t2, t3
+        global ongoing, t1, t2, t3, ship_now
         if check_mode.mode.get() == 1:  # pve
             mode_now = 'pve'
             strelka.skill[0].cd_now = 5
@@ -1526,6 +1553,11 @@ class YuiStart(threading.Thread):
             all = t1_tmp + t2_tmp
             add_summon(t1_tmp)
             add_summon(t2_tmp)
+
+            if '馬里阿努斯' in t2:
+                ship_now = copy.deepcopy(ship)
+                t1_tmp.append(ship_now)
+                name_ship.config(text='船\nHP: 500/500')
 
             #for a in t1_tmp:
             #    a.hp = int(a.hp * 100)
@@ -1635,7 +1667,7 @@ class YuiStart(threading.Thread):
                 t1_alive = False
                 t2_alive = False
                 for a in t1_tmp:
-                    if not a.master and a.hp_now > 0:
+                    if not a.master and a.name != '船' and a.hp_now > 0:
                         t1_alive = True
                         break
                 for a in t2_tmp:
@@ -1794,4 +1826,3 @@ b4.pack()
 b4.place(x=150, y=370)
 
 window.mainloop()
-
