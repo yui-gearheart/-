@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from PIL import Image, ImageTk
 import threading
@@ -99,6 +98,8 @@ class YuiAgent:
                     #battle_disp(self.name + 'が' + summon_monster.name + 'を召喚した', self.team)
                     if s.is_env:
                         self.env.append(summon_monster)
+                    elif summon_monster.name == '共鳴鐘':
+                        t2.append(summon_monster)
                     else:
                         t1.append(summon_monster)
                     if summon_monster.name == '骨龍':
@@ -116,10 +117,10 @@ class YuiAgent:
                 ind = [0]
             elif s.target == 'friend':  # 對友軍使用
                 if s.range == 3:  # 全體技能
-                    orbs = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船']]
+                    orbs = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船', '共鳴鐘']]
                     ind = list(range(len(orbs)))
                 else:
-                    t_chose = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船']]
+                    t_chose = [x for x in t1 if x.hp_now > 0 and x.name not in ['詛咒人偶', '船', '共鳴鐘']]
                     ind = list(range(len(t_chose)))
             elif s.name == '傷害轉移':
                 if self.orb.hp_now > 0:
@@ -760,6 +761,17 @@ greenwich.skill.append(s)
 greenwich.skill.append(YuiSkill('機槍掃射', dmg=25, cd=1, r=2))
 greenwich.skill.append(YuiSkill('鐵鉤'))
 
+leviathan = YuiAgent('雷比亞坦', hp=2000, atk=20, df=15)
+s = YuiSkill('破滅之音', dmg=25, cd=inf, r=3)
+s.cond = 50
+leviathan.skill.append(s)
+bell = YuiAgent('共鳴鐘', hp=1, atk=15, df=15)
+bell.hate = -1
+bell.passive.append(YuiSkill('共鳴', dmg=15, r=2, target='friend'))
+leviathan.skill.append(YuiSummon('設置共鳴鐘', cd=2, summon=bell))
+leviathan.skill.append(YuiSkill('獅吼功', dmg=20, cd=1, r=2))
+leviathan.skill.append(YuiSkill('撕咬'))
+
 hammett = YuiAgent('哈密特', hp=2000, atk=18, df=15)
 hammett.resist.append('侵蝕')
 s = YuiSkill('六氟銻酸雨', dmg=20, cd=inf, r=3)
@@ -905,7 +917,7 @@ all_hero = {'貝羅斯': belos, '塞萊茜布': celexib, '蕾吉娜': regina, '�
             '薇莉安娜': willianna, '琉塔': lyuda, '哈拉爾德': harald, '瑪格麗特': margrete, '歐若拉': aurora,
             '莉布絲':libuse, '奈菲提': neferti, '伊利亞': elijah, '斯特勒魯卡': strelka, '多米妮安': dominion, '莉姬亞': ligeia,
             '西里烏斯': sirius, '少爺': bouya, '卡伊達': kaeda, '阿蒂雅': adeak, '黃泉引路人': way_guider,
-            '安朵蕾雅絲': andreas, '船長格林威治': greenwich,
+            '安朵蕾雅絲': andreas, '船長格林威治': greenwich, '雷比亞坦': leviathan,
             '哈密特': hammett, '馬里阿努斯': marianus, '克維德': covid,
             '普羅斯佩羅': prospero, '骷髏兵1': skeleton1, '骷髏兵2': skeleton2,
             '坦博拉': tambora, '杜達耶夫': doudaiev,
@@ -1101,6 +1113,7 @@ images = {
     "黃泉引路人": load_image(yui_dir + "黃泉引路人.png"),
     "安朵蕾雅絲": load_image(yui_dir + "安朵蕾雅絲.png"),
     "船長格林威治": load_image(yui_dir + "船長格林威治.png"),
+    "雷比亞坦": load_image(yui_dir + "雷比亞坦.png"),
     "哈密特": load_image(yui_dir + "哈密特.png"),
     "馬里阿努斯": load_image(yui_dir + "馬里阿努斯.png"),
     "克維德": load_image(yui_dir + "克維德.png"),
@@ -1354,6 +1367,7 @@ menu6.add_command(label="卡伊達＆阿蒂雅（陷阱型）", command=lambda: 
 menu6.add_command(label="黃泉引路人（詛咒型）", command=lambda: add_boss('黃泉引路人'))
 menu6.add_command(label="安朵蕾雅絲（群攻法師型）", command=lambda: add_boss('安朵蕾雅絲'))
 menu6.add_command(label="船長格林威治（控制型）", command=lambda: add_boss('船長格林威治'))
+menu6.add_command(label="雷比亞坦（連動型）", command=lambda: add_boss('雷比亞坦'))
 menu6.add_command(label="哈密特（弱化型）", command=lambda: add_boss('哈密特'))
 menu6.add_command(label="馬里阿努斯（水戰型）", command=lambda: add_boss('馬里阿努斯'))
 menu6.add_command(label="克維德（持續傷害型）", command=lambda: add_boss('克維德'))
@@ -1524,8 +1538,8 @@ def battle_disp(v, team=4):
 hero_dps = ['蕾吉娜', '喬恩', '薇莉安娜', '琉塔', '瑪格麗特', '伊利亞', '莉姬亞', '奈菲提', '莉布絲', '斯特勒魯卡']
 hero_t = ['貝羅斯', '哈拉爾德']
 hero_heal = ['塞萊茜布', '歐若拉', '多米妮安']
-boss = ['西里烏斯', '少爺', '卡伊達', '黃泉引路人', '安朵蕾雅絲', '船長格林威治', '哈密特', '馬里阿努斯', '克維德', '普羅斯佩羅', '坦博拉',
-        '杜達耶夫', '聖王·貝羅斯', '西布莉']
+boss = ['西里烏斯', '少爺', '卡伊達', '黃泉引路人', '安朵蕾雅絲', '船長格林威治', '雷比亞坦', '哈密特', '馬里阿努斯', '克維德', '普羅斯佩羅',
+        '坦博拉', '杜達耶夫', '聖王·貝羅斯', '西布莉']
 
 test_mode = False
 
