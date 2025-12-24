@@ -49,6 +49,7 @@ BOSS：
 黃泉引路人（詛咒型）
 安朵蕾雅絲（群攻法師型）
 船長格林威治（控制型）
+雷比亞坦（聯動型）
 哈密特（弱化型）
 馬里阿努斯（水戰型）
 克維德（持續傷害型）
@@ -125,6 +126,9 @@ BOSS介紹：
 
 船長格林威治
 <img width="1020" height="856" alt="image" src="https://github.com/user-attachments/assets/540eed62-21b6-4501-bf78-09211e1d242a" />
+
+雷比亞坦
+<img width="886" height="900" alt="image" src="https://github.com/user-attachments/assets/bc775145-8fb4-42cc-bc58-5fc412ce4893" />
 
 哈密特
 <img width="1048" height="988" alt="image" src="https://github.com/user-attachments/assets/7527e7b1-5d08-4c5c-a13e-1791fb305c9b" />
