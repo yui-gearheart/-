@@ -57,6 +57,7 @@ BOSS：
 坦博拉（狂戰士型）
 杜達耶夫（控制型）
 聖王·貝羅斯（坦克型）
+德奈特·機械心（召喚型）
 西布莉（發展型）
 
 英雄介紹：
@@ -150,6 +151,9 @@ BOSS介紹：
 
 聖王·貝羅斯
 <img width="1006" height="1058" alt="image" src="https://github.com/user-attachments/assets/090e93a9-7b65-444d-acda-940c2d62a1f9" />
+
+德奈特·機械心
+<img width="906" height="998" alt="image" src="https://github.com/user-attachments/assets/444b2b02-9e6f-455f-8ec5-ec512e1e0073" />
 
 西布莉
 <img width="884" height="1038" alt="image" src="https://github.com/user-attachments/assets/9135a553-a22c-4199-9cba-a5174518dfe3" />
