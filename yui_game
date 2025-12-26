@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from PIL import Image, ImageTk
 import threading
@@ -251,6 +252,11 @@ class YuiAgent:
                 elif s.name == '離子護盾':
                     self.shield = 200
                     self.df += 5
+                elif s.name == '命令':
+                    battle_disp('艾莉安和無人機攻擊力提高，獲得額外行動', self.team)
+                    for summon_monster in self.summon_monster:
+                        summon_monster.atk += 2
+                        summon_monster.act(t1, t2)
                 elif s.name == '光合作用':
                     battle_disp('食人花生長了，生命力、攻擊力提高', self.team)
                     for p in self.summon_monster:
@@ -322,6 +328,8 @@ class YuiAgent:
                     #battle_disp(orb.name + 'が戦闘不能', orb.team)
 
     def act(self, t1, t2):
+        if self.hp_now == 0:
+            return None
         speed_cost = 0
         for d in self.debuff:
             if d.name in ['恐懼', '靜止', '凍結']:
@@ -878,6 +886,28 @@ david.skill.append(YuiSkill('球狀閃電', dmg=20, cd=2, r=2))
 david.skill.append(YuiSkill('錘擊'))
 s_charge = YuiSkill('電荷釋放', dmg=20, r=2)
 
+donnet_gearheart = YuiAgent('德奈特·機械心', hp=1500, atk=15, df=12)
+drone = YuiAgent('無人機', hp=1, atk=20, df=15)
+drone.resist.append('中毒')
+drone.skill.append(YuiSkill('機槍掃射', r=2))
+donnet_gearheart.skill.append(YuiSummon('召喚無人機', cd=2, summon=drone, num=2))
+drone = YuiAgent('治療無人機', hp=1, atk=15, df=15)
+drone.resist.append('中毒')
+drone.skill.append(YuiSkill('治療', -10, target='friend'))
+donnet_gearheart.skill.append(YuiSummon('召喚治療無人機', cd=3, summon=drone))
+s = YuiSkill('命令', dmg=0, cd=2)
+s.cond = 50
+donnet_gearheart.skill.append(s)
+donnet_gearheart.skill.append(YuiSkill('重踢'))
+elion2 = YuiAgent('艾莉安', hp=2000, atk=20, df=15)
+elion2.hate = -1
+s = YuiSkill('挑釁', target='self', dmg=0, cd=4)
+s.debuff = YuiBuff('挑釁', '仇恨', 2, last=2)
+elion2.skill.append(s)
+elion2.skill.append(YuiSkill('砲擊'))
+elion2.resist.append('中毒')
+donnet_gearheart.summon(elion2)
+
 cybele = YuiAgent('西布莉', hp=2000, atk=20, df=15)
 pea = YuiAgent('食人花', hp=200, atk=14, df=15)
 pea.hate = -1
@@ -921,7 +951,7 @@ all_hero = {'貝羅斯': belos, '塞萊茜布': celexib, '蕾吉娜': regina, '�
             '哈密特': hammett, '馬里阿努斯': marianus, '克維德': covid,
             '普羅斯佩羅': prospero, '骷髏兵1': skeleton1, '骷髏兵2': skeleton2,
             '坦博拉': tambora, '杜達耶夫': doudaiev,
-            '聖王·貝羅斯': david, '西布莉': cybele, '食人花': pea}
+            '聖王·貝羅斯': david, '德奈特·機械心': donnet_gearheart, '西布莉': cybele, '食人花': pea}
 
 
 t1 = [None, None, None, None, None]
@@ -1123,6 +1153,7 @@ images = {
     "坦博拉": load_image(yui_dir + "坦博拉.png"),
     "杜達耶夫": load_image(yui_dir + "杜達耶夫.png"),
     "聖王·貝羅斯": load_image(yui_dir + "貝羅斯.png"),
+    "德奈特·機械心": load_image(yui_dir + "喬恩.png"),
     "西布莉": load_image(yui_dir + "西布莉.png"),
     "食人花": load_image(yui_dir + "食人花.png"),
 }
@@ -1173,6 +1204,9 @@ def update_display2(t2):
                 names2[1].config(text=get_hp_text('骷髏兵1'))
                 icons2[2].config(image=images['骷髏兵'])
                 names2[2].config(text=get_hp_text('骷髏兵2'))
+            if choice == '德奈特·機械心':
+                icons2[1].config(image=images['艾莉安'])
+                names2[1].config(text='艾莉安\nHP:2000/2000')
             if choice == '西布莉':
                 icons2[1].config(image=images['食人花'])
                 names2[1].config(text='食人花1\nHP:200/200')
@@ -1375,6 +1409,7 @@ menu6.add_command(label="普羅斯佩羅(增益型）", command=lambda: add_boss
 menu6.add_command(label="坦博拉（狂戰士型）", command=lambda: add_boss('坦博拉'))
 menu6.add_command(label="杜達耶夫（控制型）", command=lambda: add_boss('杜達耶夫'))
 menu6.add_command(label="聖王·貝羅斯（坦克型）", command=lambda: add_boss('聖王·貝羅斯'))
+menu6.add_command(label="德奈特·機械心（召喚型）", command=lambda: add_boss('德奈特·機械心'))
 menu6.add_command(label="西布莉（發展型）", command=lambda: add_boss('西布莉'))
 '''
 menu6.add_command(label="シリウス（治療系）", command=lambda: add_boss('西里烏斯'))
@@ -1539,7 +1574,7 @@ hero_dps = ['蕾吉娜', '喬恩', '薇莉安娜', '琉塔', '瑪格麗特', '�
 hero_t = ['貝羅斯', '哈拉爾德']
 hero_heal = ['塞萊茜布', '歐若拉', '多米妮安']
 boss = ['西里烏斯', '少爺', '卡伊達', '黃泉引路人', '安朵蕾雅絲', '船長格林威治', '雷比亞坦', '哈密特', '馬里阿努斯', '克維德', '普羅斯佩羅',
-        '坦博拉', '杜達耶夫', '聖王·貝羅斯', '西布莉']
+        '坦博拉', '杜達耶夫', '聖王·貝羅斯', '德奈特·機械心', '西布莉']
 
 test_mode = False
 
@@ -1667,16 +1702,14 @@ class YuiStart(threading.Thread):
                     if stop:
                         break
                     for a in t1_tmp:
-                        if a.hp_now > 0:
-                            a.act(t1_tmp, t2_tmp)
+                        a.act(t1_tmp, t2_tmp)
                         if self.check_stop():
                             stop = True
                             break
                     if stop:
                         break
                     for a in t2_tmp:
-                        if a.hp_now > 0:
-                            a.act(t2_tmp, t1_tmp)
+                        a.act(t2_tmp, t1_tmp)
                         if self.check_stop():
                             stop = True
                             break
